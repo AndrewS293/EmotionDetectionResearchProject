@@ -6,7 +6,10 @@ from sklearn.pipeline import Pipeline
 def build_model():
     model = Pipeline([
         ('scaler', StandardScaler()),
-        ('clf', SVC(kernel='rbf'))
+        ('clf', SVC(
+            kernel='rbf',
+            probability=True
+        ))
     ])
 
     return model

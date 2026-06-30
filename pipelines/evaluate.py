@@ -1,14 +1,22 @@
-import matplotlib.pyplot as plt
-
 from sklearn.metrics import (
     accuracy_score,
+    f1_score,
     classification_report,
     confusion_matrix,
-    ConfusionMatrixDisplay,
-    f1_score
+    ConfusionMatrixDisplay
 )
 
-#evaluates models by getting accuracy and f1 for now, prints out confusion matrix
+import matplotlib.pyplot as plt
+
+
+EMOTION_LABELS = [
+    'Baseline',
+    'Stress',
+    'Amusement',
+    'Meditation'
+]
+
+
 def evaluate_model(model, X_test, y_test, name):
 
     y_pred = model.predict(X_test)
@@ -24,15 +32,35 @@ def evaluate_model(model, X_test, y_test, name):
     print(f"\n{name} Accuracy: {acc:.4f}")
     print(f"{name} F1 Score: {f1:.4f}")
 
-    print(classification_report(y_test, y_pred))
+    # CLASSIFICATION REPORT WITH REAL LABEL NAMES
+    print(
+        classification_report(
+            y_test,
+            y_pred,
+            target_names=EMOTION_LABELS
+        )
+    )
 
-    cm = confusion_matrix(y_test, y_pred)
+    # CONFUSION MATRIX
+    cm = confusion_matrix(
+        y_test,
+        y_pred
+    )
 
-    disp = ConfusionMatrixDisplay(cm)
+    disp = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
+        display_labels=EMOTION_LABELS
+    )
 
-    disp.plot()
+    fig, ax = plt.subplots(figsize=(7,6))
 
-    plt.title(name)
+    disp.plot(
+        ax=ax,
+        cmap='Blues',
+        values_format='d'
+    )
+
+    plt.title(f"{name} Confusion Matrix")
 
     plt.show()
 

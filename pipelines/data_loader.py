@@ -54,6 +54,7 @@ def load_all_subjects(data_dir):
     for file in os.listdir(data_dir):
         if file.endswith('.pkl'):
             path = os.path.join(data_dir, file)
+            print(path)
 
             X, y = load_subject(path)
 
