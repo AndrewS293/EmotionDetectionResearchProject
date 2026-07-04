@@ -363,6 +363,7 @@ def build_knn_features(window):
             f'{signal_name} Diff Mean'
         ])
 
+    
     return np.nan_to_num(features), feature_names
 
 
@@ -454,6 +455,33 @@ def build_xgb_features(window):
     feature_names.extend(extra_names)
 
     return np.nan_to_num(features), feature_names
+
+
+def build_amigos_features(window):
+
+    eda = window[:,0]
+    bvp = window[:,1]
+
+
+
+    features = []
+    feature_names = []
+
+    eda_features, eda_names = extract_eda_features(eda)
+    bvp_features, bvp_names = extract_bvp_features(bvp)
+
+
+    features.extend(eda_features)
+    features.extend(bvp_features)
+    
+
+    feature_names.extend(eda_names)
+    feature_names.extend(bvp_names)
+    
+    return np.nan_to_num(features), feature_names
+
+
+
 # ============================================================
 # WINDOW BUILDERS
 # ============================================================
@@ -492,6 +520,9 @@ def create_model_windows(
         X.append(features)
 
         y.append(label)
+
+        #print("features extracted")
+        #print(feature_names)
 
     return np.array(X), np.array(y), feature_names
 
