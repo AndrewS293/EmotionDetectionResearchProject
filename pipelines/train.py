@@ -103,7 +103,7 @@ def train_models(DATA_DIR):
     
         X_models[name] = all_X
         y_models[name] = all_y
-        #model_feature_names[name] = feature_names
+        model_feature_names[name] = feature_names
     
         all_X = np.array(all_X)
         all_y = np.array(all_y)
@@ -138,4 +138,6 @@ def train_models(DATA_DIR):
             f"{k} | Accuracy: {v['accuracy']:.4f} | "
             f"F1: {v['f1']:.4f}"
         )
+
+    return models, signals, labels, X_models, y_models, model_feature_names, all_X, all_y
     

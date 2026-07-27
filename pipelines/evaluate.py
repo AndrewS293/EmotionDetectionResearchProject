@@ -41,28 +41,30 @@ def evaluate_model(model, X_test, y_test, name):
         )
     )
 
-    # CONFUSION MATRIX
-    cm = confusion_matrix(
-        y_test,
-        y_pred
-    )
-
-    disp = ConfusionMatrixDisplay(
-        confusion_matrix=cm,
-        display_labels=EMOTION_LABELS
-    )
-
+    
+    # CONFUSION MATRIX 
+    cm = confusion_matrix(y_test, y_pred)
+    
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=EMOTION_LABELS)
     fig, ax = plt.subplots(figsize=(7,6))
-
-    disp.plot(
-        ax=ax,
-        cmap='Blues',
-        values_format='d'
-    )
-
+    disp.plot(ax=ax, cmap='Blues', values_format='d')
+    
     plt.title(f"{name} Confusion Matrix")
-
+    
+    # Place a text box in the bottom right corner of the figure
+    # transform=ax.transAxes uses a 0-1 scale for the plotting area
+    fig.text(
+        0.75, 0.02, # Coordinates: X=75% across figure, Y=2% from bottom
+        f"Accuracy: {acc:.2%}", 
+        fontsize=12, fontweight='bold', color='black',
+        bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray', boxstyle='round,pad=0.5')
+    )
+    
+    # Use tight_layout so the text box doesn't overlap labels
+    plt.tight_layout()
     plt.show()
+
+
 
     return {
         "accuracy": acc,
