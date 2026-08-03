@@ -15,19 +15,19 @@ EEG_COLUMNS = [
 
 
 
-def valence_to_class(valence):
+def tag_to_class(valence, arousal):
 
-    if valence < 3:
-        return 0
+    if valence >= 5 and arousal >= 5:
+        return 0 #Happy
 
-    elif valence < 5:
-        return 1
+    elif valence < 5 and arousal < 5:
+        return 1 #Sad
 
-    elif valence < 7:
-        return 2
+    elif valence >= 5 and arousal < 5:
+        return 2 #Calm
 
-    else:
-        return 3
+    elif valence < 5 and arousal >= 5:
+        return 3 #Angry
 
 
 
@@ -62,8 +62,10 @@ def load_subject(signal_path, label_path):
 
 
     valence = float(label_df.loc[0, "Valence"])
+    arousal = float(label_df.loc[0, "Arousal"])
 
-    emotion = valence_to_class(valence)
+
+    emotion = tag_to_class(valence, arousal)
 
     labels = np.full(n, emotion)
 
@@ -76,7 +78,7 @@ def load_all_subjects(data_dir):
     all_X = []
     all_y = []
 
-    #print("Dataset directory:", data_dir)
+    print("Dataset directory:", data_dir)
 
     for user in sorted(os.listdir(data_dir)):
 
@@ -122,6 +124,7 @@ def load_all_subjects(data_dir):
             all_X.append(X)
             all_y.append(y)
 
-    #print("\nSubjects loaded:", len(all_X))
+    #
+    # print("\nSubjects loaded:", len(all_X))
 
     return all_X, all_y

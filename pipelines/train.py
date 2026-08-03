@@ -86,6 +86,8 @@ def train_models(DATA_DIR):
         # BUILD FEATURES
         for i, (signal, label) in enumerate(zip(signals, labels)):
 
+            
+
             #print(f"Processing subject {i+1}/{len(signals)}")
             #print("Signal shape:", signal.shape)
             #print("Label shape:", label.shape)
@@ -95,12 +97,14 @@ def train_models(DATA_DIR):
                 label,
                 builder
             )
+            #print(feature_names)
     
             #print("Windows created:", len(Xi))
             
             all_X.extend(Xi)
             all_y.extend(yi)
-    
+
+
         X_models[name] = all_X
         y_models[name] = all_y
         model_feature_names[name] = feature_names
