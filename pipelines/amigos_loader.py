@@ -17,16 +17,16 @@ EEG_COLUMNS = [
 
 def tag_to_class(valence, arousal):
 
-    if valence >= 5 and arousal >= 5:
+    if valence >= 5 and arousal >= 6:
         return 0 #Happy
 
-    elif valence < 5 and arousal < 5:
+    elif valence < 5 and arousal < 6:
         return 1 #Sad
 
-    elif valence >= 5 and arousal < 5:
+    elif valence >= 5 and arousal < 6:
         return 2 #Calm
 
-    elif valence < 5 and arousal >= 5:
+    elif valence < 5 and arousal >= 6:
         return 3 #Angry
 
 
