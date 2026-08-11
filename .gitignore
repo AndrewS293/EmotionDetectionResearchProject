@@ -1,2 +1,4 @@
 data/
-
+_pycache_/
+*.pyc
+pipelines/_pycache_/

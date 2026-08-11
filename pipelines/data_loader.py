@@ -62,3 +62,7 @@ def load_all_subjects(data_dir):
             all_y.append(y)
 
     return all_X, all_y
+
+#These are the variables you'll want to use. They are the raw signals, just flattened and resampled. 
+#I believe they are dataframes so they should work, you can double chack though. Let me know if you need help or you need them modified in some way
+#all_X contains all the physiological signals, and all_y contains the labels for each of those signals. They are in the same order

@@ -16,7 +16,7 @@ def load_models():
 
         "Random Forest":
             joblib.load(
-                MODEL_PATH / "randomforest.pkl"
+                MODEL_PATH / "random_forest.pkl"
             ),
 
         "SVM":
@@ -26,24 +26,19 @@ def load_models():
 
         "Logistic Regression":
             joblib.load(
-                MODEL_PATH / "logistic.pkl"
+                MODEL_PATH / "logistic_regression.pkl"
             ),
 
         "KNN":
             joblib.load(
                 MODEL_PATH / "knn.pkl"
+            ),
+
+        "Gradient Boosting":
+            joblib.load(
+                MODEL_PATH / "gradient_boosting.pkl"
             )
     }
 
 
-    scaler = joblib.load(
-        MODEL_PATH / "scaler.pkl"
-    )
-
-
-    encoder = joblib.load(
-        MODEL_PATH / "label_encoder.pkl"
-    )
-
-
-    return models, scaler, encoder
+    return models

@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 def build_model():
     model = Pipeline([
         ('scaler', StandardScaler()),
-        ('clf', LogisticRegression(max_iter=1000))
+        ('clf', LogisticRegression(C = 1, max_iter=3000))
     ])
 
     return model
