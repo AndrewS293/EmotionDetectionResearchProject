@@ -40,5 +40,31 @@ def load_models():
             )
     }
 
+    feature_names = {
+        "XGBoost":
+            joblib.load(
+                MODEL_PATH / "xgboost_features.pkl"
+            ),
+        "Random Forest":
+            joblib.load(
+                MODEL_PATH / "random_forest_features.pkl"
+            ),
+        "SVM":
+            joblib.load(
+                MODEL_PATH / "svm_features.pkl"
+            ),
+        "Logistic Regression":
+            joblib.load(
+                MODEL_PATH / "logistic_regression_features.pkl"
+            ),
+        "KNN":
+            joblib.load(
+                MODEL_PATH / "knn_features.pkl"
+            ),
+        "Gradient Boosting":
+            joblib.load(
+                MODEL_PATH / "gradient_boosting_features.pkl"
+            )
+    }
 
-    return models
+    return models, feature_names

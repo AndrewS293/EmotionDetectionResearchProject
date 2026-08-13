@@ -1,0 +1,44 @@
+@app.post("/predict")
+def predict_emotion(request: SensorWindow):
+
+    sensor_window = np.array(
+        request.data,
+        dtype=float
+    )
+
+    prediction_result = predict(
+        sensor_window
+    )
+
+    ensemble_result = weighted_ensemble(
+        prediction_result["predictions"],
+        WEIGHTS
+    )
+
+    prediction_report = build_prediction_report(
+        prediction_result,
+        ensemble_result
+    )
+
+    reasoning = reasoner.analyze_state(
+        prediction_report
+    )
+
+    return {
+        "prediction": ensemble_result["prediction"],
+        "confidence": ensemble_result["confidence"],
+        "models": prediction_result,
+        "ensemble": ensemble_result,
+        "reasoning": reasoning
+    }
+
+
+
+@app.get("/health")
+def health():
+
+    return {
+        "status": "ok",
+        "models_loaded": len(models),
+        "ollama": reasoner.test_connection()
+    }

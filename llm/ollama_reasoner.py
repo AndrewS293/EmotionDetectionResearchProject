@@ -194,21 +194,6 @@ be treated as the official classification.
         )
 
         prompt = f"""
-Analyze the following output from the physiological
-emotion detection system.
-
-The machine learning models have already performed the
-classification and the ensemble has produced the final
-prediction.
-
-Your task is to explain the result.
-
-Do not perform a new classification.
-
-Do not replace the ensemble prediction.
-
-Instead:
-
 1. State the detected emotional state.
 2. Explain the confidence level.
 3. Describe which physiological features support the result.
@@ -221,25 +206,41 @@ Prediction report:
 
 {formatted_report}
 
-Return your response using exactly this structure:
+Return ONLY valid JSON.
 
-Detected State:
-<state>
+Do not include markdown.
 
-Confidence:
-<confidence description>
+Do not include ```json.
 
-Model Agreement:
-<brief explanation of model agreement>
+Do not include explanatory text before or after the JSON.
 
-Physiological Interpretation:
-<explanation of relevant physiological features>
+Use exactly these fields:
 
-Trend:
-<explanation of recent history if available>
 
-User Summary:
-<short, natural-language explanation for the user>
+    detected_state: <official ensemble prediction>,
+    confidence_percent: <ensemble confidence × 100>,
+    model_agreement: 
+        summary: <brief explanation>,
+        agreeing_models: [],
+        disagreeing_models: []
+    ,
+    physiological_interpretation: <brief explanation>,
+    trend: <brief explanation>,
+    user_summary: <short user-friendly explanation>
+
+The detected_state MUST exactly match final_prediction.
+
+The confidence_percent MUST equal ensemble_confidence × 100.
+
+The classifier names in agreeing_models and disagreeing_models MUST
+exactly match the names in model_predictions.
+
+Do not add classifiers that are not present.
+
+Do not omit classifiers that disagree with the ensemble.
+
+Return only the JSON object.
+
 """
 
         return prompt
@@ -377,207 +378,9 @@ User Summary:
             return False
 
 
-# ============================================================
-# SIMPLE TEST
-# ============================================================
 
-if __name__ == "__main__":
 
-    print(
-        "\n========================================"
-    )
-
-    print(
-        "OLLAMA REASONER TEST"
-    )
-
-    print(
-        "========================================\n"
-    )
-
-
-    # --------------------------------------------------------
-    # Example output from the ML/ensemble pipeline
-    # --------------------------------------------------------
-
-    example_report = {
-
-        "final_prediction": "Stress",
-
-        "ensemble_confidence": 0.91,
-
-
-        "model_predictions": {
-
-            "XGBoost": {
-
-                "prediction": "Stress",
-
-                "confidence": 0.94,
-
-                "weight": 0.35,
-            },
-
-
-            "Random Forest": {
-
-                "prediction": "Stress",
-
-                "confidence": 0.89,
-
-                "weight": 0.25,
-            },
-
-
-            "SVM": {
-
-                "prediction": "Stress",
-
-                "confidence": 0.86,
-
-                "weight": 0.20,
-            },
-
-
-            "KNN": {
-
-                "prediction": "Baseline",
-
-                "confidence": 0.63,
-
-                "weight": 0.10,
-            },
-
-
-            "Logistic Regression": {
-
-                "prediction": "Stress",
-
-                "confidence": 0.82,
-
-                "weight": 0.10,
-            },
-        },
-
-
-        "physiological_features": {
-
-            "EDA Mean": 0.82,
-
-            "EDA Std": 0.21,
-
-            "EDA Peak Count": 14,
-
-            "BVP Mean": 88.2,
-
-            "BVP Std": 8.4,
-
-            "TEMP Mean": 31.6,
-
-            "TEMP Std": 0.42,
-        },
-
-
-        "recent_history": {
-
-            "last_5_predictions": [
-
-                "Baseline",
-
-                "Stress",
-
-                "Stress",
-
-                "Stress",
-
-                "Stress",
-            ]
-        },
-    }
-
-
-    # --------------------------------------------------------
-    # Create reasoner
-    # --------------------------------------------------------
-
-    reasoner = OllamaReasoner(
-        model="qwen2.5:7b",
-        temperature=0.2,
-    )
-
-
-    # --------------------------------------------------------
-    # Test connection
-    # --------------------------------------------------------
-
-    print(
-        "Testing Ollama connection..."
-    )
-
-
-    if not reasoner.test_connection():
-
-        print(
-            "\nOllama is not responding."
-        )
-
-        print(
-            "Make sure Ollama is running and the model"
-            " has been downloaded."
-        )
-
-        raise SystemExit
-
-
-    print(
-        "Ollama connection successful.\n"
-    )
-
-
-    # --------------------------------------------------------
-    # Run reasoning
-    # --------------------------------------------------------
-
-    print(
-        "Sending prediction report to Ollama...\n"
-    )
-
-
-    result = reasoner.analyze_state(
-        example_report
-    )
-
-
-    # --------------------------------------------------------
-    # Display result
-    # --------------------------------------------------------
-
-    print(
-        "========================================"
-    )
-
-    print(
-        "LLM RESPONSE"
-    )
-
-    print(
-        "========================================\n"
-    )
-
-    print(result)
-
-    print(
-        "\n========================================"
-    )
-
-    print(
-        "TEST COMPLETE"
-    )
-
-    print(
-        "========================================"
-    )
-
+    
 #from llm.ollama_reasoner import OllamaReasoner
 
 #reasoner = OllamaReasoner()
