@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 
 
 EMOTION_LABELS = [
-    'Happy',
-    'Sad',
-    'Calm',
-    'Angry'
+    'Baseline',
+    'Stress',
+    'Amusement',
+    'Meditation'
 ]
 
 

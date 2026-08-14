@@ -344,26 +344,16 @@ def build_knn_features(window):
     features = []
     feature_names = []
 
-    for signal_name, w in zip(
-        ['EDA', 'BVP'],
-        [eda, bvp]
-    ):
+    eda_features, eda_names = extract_eda_features(eda)
+    bvp_features, bvp_names = extract_bvp_features(bvp)
 
-        diff = np.diff(w)
-
-        features.extend([
-            np.mean(w),
-            np.std(w),
-            np.mean(diff)
-        ])
-
-        feature_names.extend([
-            f'{signal_name} Mean',
-            f'{signal_name} Std',
-            f'{signal_name} Diff Mean'
-        ])
-
+    features.extend(eda_features)
+    features.extend(bvp_features)
     
+    feature_names.extend(eda_names)
+    feature_names.extend(bvp_names)
+
+
     return np.nan_to_num(features), feature_names
 
 

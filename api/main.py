@@ -16,11 +16,11 @@ WEIGHTS = {
     
     "Gradient Boosting": 0.70,
     
-    "SVM": 0.41,
+    "SVM": 0.32,
 
     "Logistic Regression": 0.14,
     
-    "KNN": 0.32
+    "KNN": 0.41
 }
 
 
@@ -45,7 +45,8 @@ def predict_emotion(request: SensorWindow):
     )
 
     ensemble_result = weighted_ensemble(
-        prediction_result["predictions"],
+        #prediction_result["predictions"],
+        prediction_result["probabilities"],
         WEIGHTS
     )
 

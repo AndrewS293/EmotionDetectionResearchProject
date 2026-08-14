@@ -20,7 +20,7 @@ from pipelines.feature_extraction import (
 # LOAD MODELS
 # ============================================================
 
-models = load_models()
+models, feature_names = load_models()
 
 
 # ============================================================
@@ -84,9 +84,9 @@ def predict(sensor_window):
 
     for name, model in models.items():
 
-        print(
-            f"Running {name}..."
-        )
+        #print(
+        #    f"Running {name}..."
+        #)
 
 
         # ----------------------------------------------------
