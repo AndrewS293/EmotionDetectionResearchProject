@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physiological AI Analysis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>Physiological AI Analysis</h1>
+            <p>Upload an analysis JSON file to view the AI interpretation.</p>
+        </header>
+
+        <div class="upload-box">
+            <label for="jsonFile" class="upload-button">
+                Choose JSON File
+            </label>
+
+            <input
+                type="file"
+                id="jsonFile"
+                accept=".json,application/json"
+            >
+
+            <p id="fileName">No file selected</p>
+        </div>
+
+
+        <div id="results" class="results hidden">
+
+            <!-- Detected State -->
+            <section class="state-card">
+
+                <p class="section-label">DETECTED STATE</p>
+
+                <h2 id="detectedState">--</h2>
+
+                <div class="confidence">
+                    <span id="confidence">--%</span>
+                    <span>Confidence</span>
+                </div>
+
+            </section>
+
+
+            <!-- Model Agreement -->
+            <section class="card">
+
+                <h3>Model Agreement</h3>
+
+                <p id="agreementSummary"></p>
+
+                <div class="model-columns">
+
+                    <div>
+                        <h4>Agreeing Models</h4>
+                        <ul id="agreeingModels"></ul>
+                    </div>
+
+                    <div>
+                        <h4>Disagreeing Models</h4>
+                        <ul id="disagreeingModels"></ul>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Physiological Interpretation -->
+            <section class="card">
+
+                <h3>Physiological Interpretation</h3>
+
+                <p id="physiologicalInterpretation"></p>
+
+            </section>
+
+
+            <!-- Trend -->
+            <section class="card">
+
+                <h3>Trend</h3>
+
+                <p id="trend"></p>
+
+            </section>
+
+
+            <!-- User Summary -->
+            <section class="summary-card">
+
+                <h3>Summary</h3>
+
+                <p id="userSummary"></p>
+
+            </section>
+
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

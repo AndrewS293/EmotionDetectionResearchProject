@@ -1,0 +1,210 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #666;
+}
+
+
+/* Upload */
+
+.upload-box {
+    background: white;
+    border: 2px dashed #bbb;
+    border-radius: 12px;
+    padding: 35px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.upload-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.upload-button:hover {
+    background: #555;
+}
+
+#fileName {
+    color: #777;
+    margin-top: 15px;
+}
+
+
+/* Results */
+
+.results {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+
+/* State */
+
+.state-card {
+    background: white;
+    border-radius: 14px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #777;
+    letter-spacing: 1px;
+}
+
+.state-card h2 {
+    font-size: 42px;
+    margin: 10px 0 20px;
+}
+
+.confidence {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.confidence span:first-child {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.confidence span:last-child {
+    color: #777;
+}
+
+
+/* General Cards */
+
+.card,
+.summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.card h3,
+.summary-card h3 {
+    margin-top: 0;
+}
+
+.card p,
+.summary-card p {
+    line-height: 1.6;
+    color: #444;
+}
+
+
+/* Model Agreement */
+
+.model-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.model-columns h4 {
+    margin-bottom: 10px;
+}
+
+ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+li {
+    padding: 8px 0;
+}
+
+.agree {
+    color: #16803c;
+}
+
+.disagree {
+    color: #b42318;
+}
+
+
+/* Summary */
+
+.summary-card {
+    border-left: 5px solid #333;
+}
+
+.summary-card p {
+    font-size: 18px;
+}
+
+
+/* Error */
+
+.error {
+    background: #ffe5e5;
+    color: #a00000;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 25px 15px;
+    }
+
+    .model-columns {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .state-card h2 {
+        font-size: 34px;
+    }
+
+}
