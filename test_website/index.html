@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindSense API Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>MindSense</h1>
+        <p>WESAD → ML Ensemble → AI Reasoning</p>
+    </header>
+
+    <section class="upload-card">
+
+        <h2>Test WESAD Window</h2>
+
+        <p>
+            Select a WESAD sensor window and send it to the API.
+        </p>
+
+        <input
+            type="file"
+            id="jsonFile"
+            accept=".json,application/json"
+        >
+
+        <div id="fileName">
+            No file selected
+        </div>
+
+        <button id="sendButton" disabled>
+            Send to API
+        </button>
+
+        <div id="status"></div>
+
+    </section>
+
+
+    <!-- RESULTS -->
+
+    <section id="results" class="results hidden">
+
+        <div class="state-card">
+
+            <div class="label">
+                DETECTED STATE
+            </div>
+
+            <div id="detectedState" class="state">
+                --
+            </div>
+
+            <div id="confidence" class="confidence">
+                --%
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Model Agreement</h2>
+
+            <p id="agreementSummary"></p>
+
+            <div class="models">
+
+                <div>
+                    <h3>Agreeing Models</h3>
+                    <ul id="agreeingModels"></ul>
+                </div>
+
+                <div>
+                    <h3>Disagreeing Models</h3>
+                    <ul id="disagreeingModels"></ul>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Physiological Interpretation</h2>
+
+            <p id="physiologicalInterpretation"></p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Trend</h2>
+
+            <p id="trend"></p>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h2>User Summary</h2>
+
+            <p id="userSummary"></p>
+
+        </div>
+
+
+        <!-- Raw API response -->
+
+        <div class="card">
+
+            <h2>API Response</h2>
+
+            <pre id="rawJson"></pre>
+
+        </div>
+
+    </section>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
