@@ -1,0 +1,212 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+
+/* Header */
+
+header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+header h1 {
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #666;
+}
+
+
+/* Upload */
+
+.upload-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.upload-card h2 {
+    margin-top: 0;
+}
+
+input[type="file"] {
+    margin: 20px 0;
+}
+
+#fileName {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #222;
+    color: white;
+}
+
+button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background: #444;
+}
+
+
+/* Status */
+
+#status {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+
+/* Results */
+
+.results {
+    margin-top: 30px;
+}
+
+.hidden {
+    display: none;
+}
+
+
+/* State */
+
+.state-card {
+    background: white;
+    border-radius: 12px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #777;
+    letter-spacing: 1px;
+}
+
+.state {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.confidence {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+/* Cards */
+
+.card,
+.summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+
+.card h2,
+.summary-card h2 {
+    margin-top: 0;
+}
+
+.card p,
+.summary-card p {
+    line-height: 1.6;
+}
+
+
+/* Models */
+
+.models {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.models h3 {
+    font-size: 16px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 8px 0;
+}
+
+
+/* Summary */
+
+.summary-card {
+    border-left: 5px solid #222;
+}
+
+.summary-card p {
+    font-size: 18px;
+}
+
+
+/* Raw JSON */
+
+pre {
+    background: #f1f1f1;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .container {
+        width: 94%;
+        padding: 20px 0;
+    }
+
+    .models {
+        grid-template-columns: 1fr;
+    }
+
+    .state {
+        font-size: 34px;
+    }
+
+}

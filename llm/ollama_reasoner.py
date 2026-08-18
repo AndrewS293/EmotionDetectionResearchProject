@@ -105,6 +105,27 @@ physiological sensor data such as:
 The machine learning models are responsible for
 classifying the user's physiological state.
 
+STRICT OUTPUT RULES:
+
+The machine learning ensemble is the authoritative
+source for classification.
+
+You are NOT allowed to change or reinterpret the
+ensemble's final prediction.
+
+You are NOT allowed to calculate a new confidence.
+
+You are NOT allowed to introduce emotion classes
+that do not appear in the prediction report.
+
+You are NOT allowed to invent physiological
+measurements or trends.
+
+Your role is explanation only.
+
+Python code outside of the LLM is responsible for
+the final prediction, confidence, and model agreement.
+
 You are NOT the classifier.
 
 You must NOT override the machine learning ensemble's
@@ -186,62 +207,74 @@ be treated as the official classification.
         prediction_report: Dict[str, Any],
     ) -> str:
         """
-        Build the user portion of the LLM prompt.
+        Build a constrained prompt for the LLM.
+    
+        The LLM is ONLY responsible for explaining the
+        prediction. It does not determine the prediction
+        or confidence.
         """
-
+    
         formatted_report = self._format_prediction_report(
             prediction_report
         )
-
+    
         prompt = f"""
-1. State the detected emotional state.
-2. Explain the confidence level.
-3. Describe which physiological features support the result.
-4. Discuss agreement or disagreement between models.
-5. Consider recent prediction history if it is provided.
-6. Explain whether the result appears sustained or isolated.
-7. Provide a short user-friendly interpretation.
+    You are the explanation layer of a physiological
+    emotion detection system.
+    
+    The machine learning ensemble is the authoritative
+    classifier.
+    
+    Your job is ONLY to explain the results provided below.
+    
+    IMPORTANT RULES:
+    
+    1. Do NOT change the final prediction.
+    2. Do NOT create a new emotion class.
+    3. Do NOT calculate or modify the ensemble confidence.
+    4. Do NOT invent model predictions.
+    5. Do NOT invent confidence values.
+    6. Do NOT invent physiological measurements.
+    7. Do NOT claim that a physiological feature changed
+       unless that information is explicitly present in the
+       prediction report.
+    8. Do NOT make medical diagnoses.
+    9. If insufficient physiological information is provided,
+       explicitly say so.
+    10. Treat the values in the prediction report as factual
+        outputs from the machine learning system.
+    
+    The following prediction report is authoritative:
+    
+    {formatted_report}
+    
+    Generate ONLY an explanation of the results.
+    
+    Return valid JSON with EXACTLY these fields:
+    
+    {{
+        "model_agreement_summary": "<brief explanation of how the models agreed or disagreed>",
+        "physiological_interpretation": "<brief explanation based ONLY on physiological information explicitly provided>",
+        "trend": "<brief explanation of recent prediction history if provided>",
+        "user_summary": "<short user-friendly explanation>"
+    }}
+    
+    Do not include:
+    
+    - detected_state
+    - confidence_percent
+    - alternative emotion labels
+    - invented sensor values
+    - invented model predictions
+    
+    Do not include markdown.
+    
+    Do not include ```json.
+    
+    Return ONLY the JSON object.
+    """
 
-Prediction report:
-
-{formatted_report}
-
-Return ONLY valid JSON.
-
-Do not include markdown.
-
-Do not include ```json.
-
-Do not include explanatory text before or after the JSON.
-
-Use exactly these fields:
-
-
-    detected_state: <official ensemble prediction>,
-    confidence_percent: <ensemble confidence × 100>,
-    model_agreement: 
-        summary: <brief explanation>,
-        agreeing_models: [],
-        disagreeing_models: []
-    ,
-    physiological_interpretation: <brief explanation>,
-    trend: <brief explanation>,
-    user_summary: <short user-friendly explanation>
-
-The detected_state MUST exactly match final_prediction.
-
-The confidence_percent MUST equal ensemble_confidence × 100.
-
-The classifier names in agreeing_models and disagreeing_models MUST
-exactly match the names in model_predictions.
-
-Do not add classifiers that are not present.
-
-Do not omit classifiers that disagree with the ensemble.
-
-Return only the JSON object.
-
-"""
+    
 
         return prompt
 
@@ -253,22 +286,15 @@ Return only the JSON object.
     def analyze_state(
         self,
         prediction_report: Dict[str, Any],
-    ) -> str:
+    ) -> Dict[str, Any]:
         """
-        Send a prediction report to Ollama and return the
-        generated interpretation.
-
-        Parameters
-        ----------
-        prediction_report : dict
-            Structured output from the ML/ensemble pipeline.
-
-        Returns
-        -------
-        str
-            LLM-generated interpretation.
+        Analyze a prediction report using Ollama.
+    
+        The ML ensemble remains authoritative for the
+        prediction and confidence. Ollama only generates
+        explanatory information.
         """
-
+    
         if not isinstance(
             prediction_report,
             dict,
@@ -276,30 +302,218 @@ Return only the JSON object.
             raise TypeError(
                 "prediction_report must be a dictionary."
             )
+    
+        # --------------------------------------------------------
+        # AUTHORITATIVE ML OUTPUTS
+        # --------------------------------------------------------
+
+        # Your prediction report may contain the ensemble information
+        # either at the top level or inside an "ensemble" dictionary.
+
+        ensemble = prediction_report.get("ensemble", {})
+
+        if not isinstance(ensemble, dict):
+            ensemble = {}
 
 
-        system_message = SystemMessage(
-            content=self._system_prompt()
+        # --------------------------------------------------------
+        # FINAL PREDICTION
+        # --------------------------------------------------------
+
+        final_prediction = (
+            ensemble.get("prediction")
+            or prediction_report.get("prediction")
+            or prediction_report.get("final_prediction")
         )
 
 
+        # --------------------------------------------------------
+        # ENSEMBLE CONFIDENCE
+        # --------------------------------------------------------
+
+        ensemble_confidence = (
+            ensemble.get("confidence")
+            if ensemble.get("confidence") is not None
+            else prediction_report.get("confidence")
+        )
+
+        if ensemble_confidence is None:
+            ensemble_confidence = prediction_report.get(
+                "ensemble_confidence"
+            )
+
+
+        # --------------------------------------------------------
+        # MODEL PREDICTIONS
+        # --------------------------------------------------------
+
+        models = prediction_report.get(
+            "models",
+            {}
+        )
+
+        if not isinstance(models, dict):
+            models = {}
+
+
+        model_predictions = models.get(
+            "predictions",
+            {}
+        )
+
+
+        # Support the older report format too
+        if not model_predictions:
+
+            model_predictions = prediction_report.get(
+                "model_predictions",
+                {}
+            )
+
+
+        # --------------------------------------------------------
+        # SAFETY CHECK
+        # --------------------------------------------------------
+
+        if final_prediction is None:
+
+            raise ValueError(
+                "Could not find ensemble prediction in prediction report. "
+                f"Available keys: {list(prediction_report.keys())}"
+            )
+
+
+        if ensemble_confidence is None:
+
+            raise ValueError(
+                "Could not find ensemble confidence in prediction report. "
+                f"Available keys: {list(prediction_report.keys())}"
+            )
+
+
+        # --------------------------------------------------------
+        # CALCULATE MODEL AGREEMENT IN PYTHON
+        # --------------------------------------------------------
+
+        agreeing_models = [
+            name
+            for name, prediction
+            in model_predictions.items()
+            if prediction == final_prediction
+        ]
+
+        disagreeing_models = [
+            name
+            for name, prediction
+            in model_predictions.items()
+            if prediction != final_prediction
+        ]
+
+
+        model_agreement = {
+
+            "summary": (
+                f"{len(agreeing_models)} of "
+                f"{len(model_predictions)} models "
+                f"predicted {final_prediction}."
+            ),
+
+            "agreeing_models": agreeing_models,
+
+            "disagreeing_models": disagreeing_models,
+        }
+                # --------------------------------------------------------
+        # SEND REPORT TO OLLAMA
+        # --------------------------------------------------------
+    
+        system_message = SystemMessage(
+            content=self._system_prompt()
+        )
+    
         human_message = HumanMessage(
             content=self._build_prompt(
                 prediction_report
             )
         )
-
-
+    
         response = self.llm.invoke(
             [
                 system_message,
                 human_message,
             ]
         )
-
-
-        return response.content
-
+    
+        # --------------------------------------------------------
+        # PARSE LLM RESPONSE
+        # --------------------------------------------------------
+    
+        try:
+    
+            llm_result = json.loads(
+                response.content
+            )
+    
+        except json.JSONDecodeError:
+    
+            # Don't allow malformed LLM output to break
+            # the authoritative ML result.
+    
+            llm_result = {
+                "model_agreement_summary": "",
+                "physiological_interpretation": "",
+                "trend": "",
+                "user_summary": response.content,
+            }
+    
+        # --------------------------------------------------------
+        # BUILD FINAL RESPONSE
+        # --------------------------------------------------------
+    
+        final_response = {
+    
+            # THESE COME DIRECTLY FROM THE ML PIPELINE
+            "detected_state": final_prediction,
+    
+            "confidence_percent": round(
+                ensemble_confidence * 100
+            ),
+    
+            # THIS IS CALCULATED BY PYTHON
+            "model_agreement": {
+    
+                "summary": model_agreement[
+                    "summary"
+                ],
+    
+                "agreeing_models": agreeing_models,
+    
+                "disagreeing_models": disagreeing_models,
+            },
+    
+            # THESE COME FROM OLLAMA
+            "physiological_interpretation": (
+                llm_result.get(
+                    "physiological_interpretation",
+                    ""
+                )
+            ),
+    
+            "trend": (
+                llm_result.get(
+                    "trend",
+                    ""
+                )
+            ),
+    
+            "user_summary": (
+                llm_result.get(
+                    "user_summary",
+                    ""
+                )
+            ),
+        }
+    
+        return final_response
 
     # ========================================================
     # ANALYZE WITH OPTIONAL USER CONTEXT
@@ -390,4 +604,3 @@ Return only the JSON object.
 #)
 
 #print(response)
-

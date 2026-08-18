@@ -6,7 +6,7 @@ import numpy as np
 CLASS_NAMES = [ "Baseline", "Stress", "Amusement", "Meditation" ] 
 
 def weighted_ensemble( probabilities, weights ): 
-    """ Combine model probability predictions using weighted averaging. Parameters ---------- probabilities : dict Dictionary containing model probability dictionaries. Example: { "XGBoost": { "Baseline": 0.05, "Stress": 0.85, "Amusement": 0.05, "Meditation": 0.05 }, "SVM": { ... } } weights : dict Model weights. Example: { "XGBoost": 0.30, "Random Forest": 0.25, "Gradient Boosting": 0.20, "SVM": 0.15, "Logistic Regression": 0.05, "KNN": 0.05 } Returns ------- dict Final prediction, confidence, and combined class probabilities. """ 
+    
     # -------------------------------------------------------- 
     # Initialize class scores 
     # -------------------------------------------------------- 
