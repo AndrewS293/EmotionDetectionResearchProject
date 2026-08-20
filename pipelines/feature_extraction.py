@@ -480,8 +480,8 @@ def create_model_windows(
     signal,
     labels,
     feature_builder,
-    window_size=400,
-    step=50
+    window_size=200,
+    step=200
 ):
 
     X = []

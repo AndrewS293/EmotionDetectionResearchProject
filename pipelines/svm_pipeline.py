@@ -8,7 +8,8 @@ def build_model():
         ('scaler', StandardScaler()),
         ('clf', SVC(
             kernel='rbf',
-            probability=True
+            probability=True,
+            class_weight='balanced'
         ))
     ])
 
