@@ -15,7 +15,7 @@ from sklearn.utils.class_weight import compute_sample_weight
 CLASS_WEIGHTS = {
     0: 1.0,
     1: 1.2,
-    2: 1.5,
+    2: 2.0,
     3: 2.5,
 }
 

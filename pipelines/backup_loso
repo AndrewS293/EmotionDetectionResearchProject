@@ -26,10 +26,6 @@ from pipelines.xgboost_pipeline import build_model as xgb_model
 from pipelines.knn_pipeline import build_model as knn_model
 from pipelines.gradientboost_pipeline import build_model as gb_model
 
-from pipelines.subject_normalization import build_subject_baseline
-
-
-
 
 # ============================================================
 # CONFIGURATION
@@ -83,31 +79,6 @@ MODEL_BUILDERS = {
     "XGBoost": xgb_model
 }
 
-
-def create_subject_features_with_baseline(
-    subject,
-    subject_baseline,
-    window_size=400,
-    step=200
-):
-
-    X = {}
-    y = {}
-
-    for model_name, feature_builder in FEATURE_BUILDERS.items():
-
-        X[model_name], y[model_name], feature_names = (
-            create_model_windows(
-                subject["signal"],
-                subject["labels"],
-                feature_builder,
-                window_size=window_size,
-                step=step,
-                subject_baseline=subject_baseline
-            )
-        )
-
-    return X, y
 
 # ============================================================
 # LOAD SUBJECTS
@@ -223,6 +194,35 @@ def run_loso(data_dir):
 
     print(f"\nLoaded {len(subjects)} subjects.")
 
+    # --------------------------------------------------------
+    # PRE-COMPUTE FEATURES
+    #
+    # This does NOT train anything.
+    # We are simply converting each subject into feature windows.
+    # --------------------------------------------------------
+
+    processed_subjects = []
+
+    for i, subject in enumerate(subjects):
+
+        print(
+            f"\nCreating features for "
+            f"{subject['name']} ({i + 1}/{len(subjects)})"
+        )
+
+        X, y = create_subject_features(subject)
+
+        processed_subjects.append({
+            "name": subject["name"],
+            "X": X,
+            "y": y
+        })
+
+        for model_name in X:
+            print(
+                f"  {model_name}: "
+                f"{X[model_name].shape}"
+            )
 
     # --------------------------------------------------------
     # STORAGE FOR GLOBAL RESULTS
@@ -242,33 +242,15 @@ def run_loso(data_dir):
     # LOSO LOOP
     # ========================================================
 
-    for test_index in range(len(subjects)):
+    for test_index in range(len(processed_subjects)):
 
-        test_subject = subjects[test_index]
+        test_subject = processed_subjects[test_index]
 
         train_subjects = [
             subject
-            for i, subject in enumerate(subjects)
+            for i, subject in enumerate(processed_subjects)
             if i != test_index
         ]
-
-        # ----------------------------------------------------
-        # BUILD SUBJECT BASELINES
-        # ----------------------------------------------------
-
-        test_baseline = build_subject_baseline(
-            test_subject
-        )
-
-        train_baselines = {}
-
-        for subject in train_subjects:
-
-            train_baselines[
-                subject["name"]
-            ] = build_subject_baseline(
-                subject
-            )
 
         print("\n")
         print("=" * 70)
@@ -289,71 +271,28 @@ def run_loso(data_dir):
 
         for model_name in MODEL_BUILDERS:
 
-            feature_builder = FEATURE_BUILDERS[
-                model_name
-            ]
-
             train_X = []
             train_y = []
 
-            # ====================================================
-            # TRAINING SUBJECTS
-            # ====================================================
-
             for subject in train_subjects:
 
-                baseline = train_baselines[
-                    subject["name"]
-                ]
-
-                X_subject, y_subject, _ = (
-                    create_model_windows(
-                        subject["signal"],
-                        subject["labels"],
-                        feature_builder,
-                        window_size=400,
-                        step=200,
-                        subject_baseline=baseline
-                    )
-                )
-
                 train_X.extend(
-                    X_subject
+                    subject["X"][model_name]
                 )
 
                 train_y.extend(
-                    y_subject
+                    subject["y"][model_name]
                 )
 
-            X_train[model_name] = np.asarray(
-                train_X
-            )
-
-            y_train[model_name] = np.asarray(
-                train_y
-            )
-
-            # ====================================================
-            # TEST SUBJECT
-            # ====================================================
-
-            X_subject_test, y_subject_test, _ = (
-                create_model_windows(
-                    test_subject["signal"],
-                    test_subject["labels"],
-                    feature_builder,
-                    window_size=400,
-                    step=200,
-                    subject_baseline=test_baseline
-                )
-            )
+            X_train[model_name] = np.asarray(train_X)
+            y_train[model_name] = np.asarray(train_y)
 
             X_test[model_name] = np.asarray(
-                X_subject_test
+                test_subject["X"][model_name]
             )
 
             y_test[model_name] = np.asarray(
-                y_subject_test
+                test_subject["y"][model_name]
             )
 
         # ----------------------------------------------------
@@ -372,39 +311,9 @@ def run_loso(data_dir):
 
             model = model_builder()
 
-            from pipelines.class_balancing import (
-                get_sample_weights
-            )
-
-            X_train_model = X_train[
-                model_name
-            ]
-
-            y_train_model = y_train[
-                model_name
-            ]
-
-            if model_name in [
-                "Gradient Boosting",
-                "XGBoost"
-            ]:
-
-                model.fit(
-                    X_train_model,
-                    y_train_model,
-                    sample_weight=sample_weights
-                )
-
-            else:
-
-                model.fit(
-                    X_train_model,
-                    y_train_model
-                )
-
-            sample_weights = get_sample_weights(
-                y_train_model,
-                method="manual"
+            model.fit(
+                X_train[model_name],
+                y_train[model_name]
             )
 
             models[model_name] = model

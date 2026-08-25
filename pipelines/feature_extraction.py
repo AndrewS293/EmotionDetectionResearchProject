@@ -19,6 +19,39 @@ from scipy.signal import find_peaks
 # EDA FEATURES
 # ------------------------------------------------------------
 
+def add_subject_normalized_features(
+    features,
+    feature_names,
+    window,
+    subject_baseline,
+    signal_columns
+):
+
+    if subject_baseline is None:
+        return features, feature_names
+
+    for signal_name, column_index in signal_columns:
+
+        normalized = (
+            subject_baseline
+            .transform_summary(
+                signal_name,
+                window[:, column_index]
+            )
+        )
+
+        names = (
+            subject_baseline
+            .feature_names(
+                signal_name
+            )
+        )
+
+        features.extend(normalized)
+        feature_names.extend(names)
+
+    return features, feature_names
+
 def extract_eda_features(w):
 
     features = []
@@ -267,17 +300,20 @@ def extract_acc_features(
 # LOGISTIC REGRESSION FEATURES
 # ------------------------------------------------------------
 
-def build_logistic_features(window):
+def build_logistic_features(
+    window,
+    subject_baseline=None
+):
 
-    eda = window[:,0]
-    bvp = window[:,1]
-    temp = window[:,2]
+    eda = window[:, 0]
+    bvp = window[:, 1]
+    temp = window[:, 2]
 
     features = []
     feature_names = []
 
     for signal_name, w in zip(
-        ['EDA', 'BVP', 'TEMP'],
+        ["EDA", "BVP", "TEMP"],
         [eda, bvp, temp]
     ):
 
@@ -289,99 +325,173 @@ def build_logistic_features(window):
         ])
 
         feature_names.extend([
-            f'{signal_name} Mean',
-            f'{signal_name} Std',
-            f'{signal_name} Min',
-            f'{signal_name} Max'
+            f"{signal_name} Mean",
+            f"{signal_name} Std",
+            f"{signal_name} Min",
+            f"{signal_name} Max"
         ])
 
-    return np.nan_to_num(features), feature_names
+    features, feature_names = (
+        add_subject_normalized_features(
+            features,
+            feature_names,
+            window,
+            subject_baseline,
+            [
+                ("EDA", 0),
+                ("BVP", 1),
+                ("TEMP", 2)
+            ]
+        )
+    )
+
+    return (
+        np.nan_to_num(features),
+        feature_names
+    )
 
 
 # ------------------------------------------------------------
 # SVM FEATURES
 # ------------------------------------------------------------
 
-def build_svm_features(window):
+def build_svm_features(
+    window,
+    subject_baseline=None
+):
 
-    eda = window[:,0]
-    bvp = window[:,1]
-    temp = window[:,2]
+    eda = window[:, 0]
+    bvp = window[:, 1]
+    temp = window[:, 2]
 
     features = []
     feature_names = []
 
-    # EDA
-    eda_features, eda_names = extract_eda_features(eda)
+    eda_features, eda_names = (
+        extract_eda_features(eda)
+    )
+
+    bvp_features, bvp_names = (
+        extract_bvp_features(bvp)
+    )
+
+    temp_features, temp_names = (
+        extract_temp_features(temp)
+    )
 
     features.extend(eda_features)
-    feature_names.extend(eda_names)
-
-    # BVP
-    bvp_features, bvp_names = extract_bvp_features(bvp)
-
     features.extend(bvp_features)
-    feature_names.extend(bvp_names)
-
-    # TEMP
-    temp_features, temp_names = extract_temp_features(temp)
-
     features.extend(temp_features)
+
+    feature_names.extend(eda_names)
+    feature_names.extend(bvp_names)
     feature_names.extend(temp_names)
 
-    return np.nan_to_num(features), feature_names
+    features, feature_names = (
+        add_subject_normalized_features(
+            features,
+            feature_names,
+            window,
+            subject_baseline,
+            [
+                ("EDA", 0),
+                ("BVP", 1),
+                ("TEMP", 2)
+            ]
+        )
+    )
+
+    return (
+        np.nan_to_num(features),
+        feature_names
+    )
 
 
 # ------------------------------------------------------------
 # KNN FEATURES
 # ------------------------------------------------------------
 
-def build_knn_features(window):
+def build_knn_features(
+    window,
+    subject_baseline=None
+):
 
-    eda = window[:,0]
-    bvp = window[:,1]
+    eda = window[:, 0]
+    bvp = window[:, 1]
 
     features = []
     feature_names = []
 
-    eda_features, eda_names = extract_eda_features(eda)
-    bvp_features, bvp_names = extract_bvp_features(bvp)
+    eda_features, eda_names = (
+        extract_eda_features(eda)
+    )
+
+    bvp_features, bvp_names = (
+        extract_bvp_features(bvp)
+    )
 
     features.extend(eda_features)
     features.extend(bvp_features)
-    
+
     feature_names.extend(eda_names)
     feature_names.extend(bvp_names)
 
+    features, feature_names = (
+        add_subject_normalized_features(
+            features,
+            feature_names,
+            window,
+            subject_baseline,
+            [
+                ("EDA", 0),
+                ("BVP", 1)
+            ]
+        )
+    )
 
-    return np.nan_to_num(features), feature_names
-
+    return (
+        np.nan_to_num(features),
+        feature_names
+    )
 
 # ------------------------------------------------------------
 # RANDOM FOREST FEATURES
 # ------------------------------------------------------------
 
-def build_rf_features(window):
+def build_rf_features(
+    window,
+    subject_baseline=None
+):
 
-    eda = window[:,0]
-    bvp = window[:,1]
-    temp = window[:,2]
+    eda = window[:, 0]
+    bvp = window[:, 1]
+    temp = window[:, 2]
 
-    acc_x = window[:,3]
-    acc_y = window[:,4]
-    acc_z = window[:,5]
+    acc_x = window[:, 3]
+    acc_y = window[:, 4]
+    acc_z = window[:, 5]
 
     features = []
     feature_names = []
 
-    eda_features, eda_names = extract_eda_features(eda)
-    bvp_features, bvp_names = extract_bvp_features(bvp)
-    temp_features, temp_names = extract_temp_features(temp)
+    eda_features, eda_names = (
+        extract_eda_features(eda)
+    )
 
-    acc_features, acc_names = extract_acc_features(
-        acc_x,
-        acc_y,
-        acc_z
+    bvp_features, bvp_names = (
+        extract_bvp_features(bvp)
+    )
+
+    temp_features, temp_names = (
+        extract_temp_features(temp)
+    )
+
+    acc_features, acc_names = (
+        extract_acc_features(
+            acc_x,
+            acc_y,
+            acc_z
+        )
     )
 
     features.extend(eda_features)
@@ -394,57 +504,94 @@ def build_rf_features(window):
     feature_names.extend(temp_names)
     feature_names.extend(acc_names)
 
-    return np.nan_to_num(features), feature_names
+    features, feature_names = (
+        add_subject_normalized_features(
+            features,
+            feature_names,
+            window,
+            subject_baseline,
+            [
+                ("EDA", 0),
+                ("BVP", 1),
+                ("TEMP", 2)
+            ]
+        )
+    )
+
+    return (
+        np.nan_to_num(features),
+        feature_names
+    )
 
 
 # ------------------------------------------------------------
 # GRADIENT BOOSTING FEATURES
 # ------------------------------------------------------------
 
-def build_gb_features(window):
+def build_gb_features(
+    window,
+    subject_baseline=None
+):
 
-    return build_rf_features(window)
+    return build_rf_features(
+        window,
+        subject_baseline
+    )
 
 
 # ------------------------------------------------------------
 # XGBOOST FEATURES
 # ------------------------------------------------------------
 
-def build_xgb_features(window):
+def build_xgb_features(
+    window,
+    subject_baseline=None
+):
 
-    rf_features, rf_feature_names = build_rf_features(window)
+    rf_features, rf_feature_names = (
+        build_rf_features(
+            window,
+            subject_baseline
+        )
+    )
 
-    # Convert back to list so we can extend
-    features = list(rf_features)
+    features = list(
+        rf_features
+    )
 
-    feature_names = list(rf_feature_names)
+    feature_names = list(
+        rf_feature_names
+    )
 
-    eda = window[:,0]
-    bvp = window[:,1]
+    eda = window[:, 0]
+    bvp = window[:, 1]
 
-    extra_features = []
-    extra_names = []
+    extra_features = [
+        skew(eda),
+        kurtosis(eda),
+        skew(bvp),
+        kurtosis(bvp)
+    ]
 
-    for signal_name, w in zip(
-        ['EDA', 'BVP'],
-        [eda, bvp]
-    ):
+    extra_names = [
+        "EDA Global Skew",
+        "EDA Global Kurtosis",
+        "BVP Global Skew",
+        "BVP Global Kurtosis"
+    ]
 
-        extra_features.extend([
-            skew(w),
-            kurtosis(w)
-        ])
+    features.extend(
+        extra_features
+    )
 
-        extra_names.extend([
-            f'{signal_name} Global Skew',
-            f'{signal_name} Global Kurtosis'
-        ])
+    feature_names.extend(
+        extra_names
+    )
 
-    features.extend(extra_features)
-
-    feature_names.extend(extra_names)
-
-    return np.nan_to_num(features), feature_names
+    return (
+        np.nan_to_num(features),
+        feature_names
+    )
 
 
 def build_amigos_features(window):
@@ -480,8 +627,9 @@ def create_model_windows(
     signal,
     labels,
     feature_builder,
-    window_size=200,
-    step=200
+    window_size=400,
+    step=200,
+    subject_baseline=None
 ):
 
     X = []
@@ -489,7 +637,7 @@ def create_model_windows(
 
     for i in range(
         0,
-        len(signal) - window_size,
+        len(signal) - window_size+1,
         step
     ):
 
@@ -500,12 +648,12 @@ def create_model_windows(
         label_window = labels[
             i:i+window_size
         ]
-
+    
         label = np.bincount(
             label_window
         ).argmax()
 
-        features, feature_names = feature_builder(window)
+        features, feature_names = feature_builder(window, subject_baseline=subject_baseline)
 
         X.append(features)
 
