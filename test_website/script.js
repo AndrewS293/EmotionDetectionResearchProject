@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000/predict";
+const API_URL = "api/predict";
 
 
 const fileInput = document.getElementById("jsonFile");
@@ -10,6 +10,48 @@ const status = document.getElementById("status");
 const results = document.getElementById("results");
 
 let selectedFile = null;
+let hasShownFirstResult = false;
+
+
+/* ============================================
+   UPLOAD PANEL <-> DRAWER
+============================================ */
+
+const uploadPanel = document.getElementById("uploadPanel");
+const newSampleTab = document.getElementById("newSampleTab");
+const drawerOverlay = document.getElementById("drawerOverlay");
+const closeDrawerButton = document.getElementById("closeDrawer");
+
+function enterDrawerMode() {
+
+    uploadPanel.classList.add("drawer");
+    uploadPanel.classList.remove("open");
+
+    newSampleTab.classList.remove("hidden");
+
+    drawerOverlay.classList.remove("visible");
+
+}
+
+function openDrawer() {
+
+    uploadPanel.classList.add("open");
+
+    drawerOverlay.classList.add("visible");
+
+}
+
+function closeDrawer() {
+
+    uploadPanel.classList.remove("open");
+
+    drawerOverlay.classList.remove("visible");
+
+}
+
+newSampleTab.addEventListener("click", openDrawer);
+closeDrawerButton.addEventListener("click", closeDrawer);
+drawerOverlay.addEventListener("click", closeDrawer);
 
 
 /* ============================================
@@ -119,6 +161,21 @@ sendButton.addEventListener("click", async function() {
         displayResult(result);
 
 
+        /* Tuck the upload panel away into the drawer tab */
+
+        enterDrawerMode();
+
+        if (!hasShownFirstResult) {
+
+            hasShownFirstResult = true;
+
+        } else {
+
+            closeDrawer();
+
+        }
+
+
     } catch (error) {
 
         console.error(error);
@@ -134,6 +191,24 @@ sendButton.addEventListener("click", async function() {
         sendButton.disabled = false;
 
     }
+
+});
+
+
+/* ============================================
+   RAW JSON — collapsible
+============================================ */
+
+const rawJsonToggle = document.getElementById("rawJsonToggle");
+const rawJsonContent = document.getElementById("rawJson");
+
+rawJsonToggle.addEventListener("click", function() {
+
+    const isCollapsed = rawJsonContent.classList.toggle("collapsed");
+
+    rawJsonToggle.setAttribute("aria-expanded", String(!isCollapsed));
+
+    rawJsonToggle.classList.toggle("expanded", !isCollapsed);
 
 });
 
@@ -197,12 +272,24 @@ function displayResult(data) {
        CONFIDENCE
     ======================================== */
 
+    const confidencePercent =
+        reasoning.confidence_percent !== undefined
+            ? reasoning.confidence_percent
+            : null;
+
     document.getElementById(
         "confidence"
     ).textContent =
-        reasoning.confidence_percent !== undefined
-            ? `${reasoning.confidence_percent}%`
+        confidencePercent !== null
+            ? `${confidencePercent}%`
             : "--%";
+
+    document.getElementById(
+        "confidenceBar"
+    ).style.width =
+        confidencePercent !== null
+            ? `${Math.max(0, Math.min(100, confidencePercent))}%`
+            : "0%";
 
 
     /* ========================================
@@ -296,17 +383,35 @@ function displayResult(data) {
 
 
     /* ========================================
-       RAW JSON
+       RAW JSON (collapsed by default)
     ======================================== */
 
-    document.getElementById(
-        "rawJson"
-    ).textContent =
+    rawJsonContent.textContent =
         JSON.stringify(data, null, 4);
+
+    rawJsonContent.classList.add("collapsed");
+
+    rawJsonToggle.setAttribute("aria-expanded", "false");
+
+    rawJsonToggle.classList.remove("expanded");
 
 
     /* Show results */
 
     results.classList.remove("hidden");
+
+    /* Re-trigger the pulse-trace draw-in animation */
+
+    const trace = document.querySelector(".pulse-trace path");
+
+    if (trace) {
+
+        trace.style.animation = "none";
+
+        void trace.offsetWidth; // force reflow
+
+        trace.style.animation = "";
+
+    }
 
 }
