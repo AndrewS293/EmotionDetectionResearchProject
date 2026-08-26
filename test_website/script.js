@@ -354,7 +354,7 @@ function displayResult(data) {
 
     /* ========================================
        PHYSIOLOGICAL INTERPRETATION
-    ======================================== */
+    ======================================== /
 
     document.getElementById(
         "physiologicalInterpretation"
@@ -362,7 +362,7 @@ function displayResult(data) {
         reasoning.physiological_interpretation || "";
 
 
-    /* ========================================
+    / ========================================
        TREND
     ======================================== */
 
