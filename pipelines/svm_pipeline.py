@@ -8,9 +8,11 @@ def build_model():
         ('scaler', StandardScaler()),
         ('clf', SVC(
             kernel='rbf',
+            C=2.0,
+            gamma = 0.05,
             class_weight='balanced',
             probability=True
         ))
     ])
 
-    return model
+    return model 

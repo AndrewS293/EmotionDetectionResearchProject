@@ -46,17 +46,17 @@ EMOTION_LABELS = [
 # These are the same weights you have been using
 WEIGHTS = {
 
-    "XGBoost": 0.199,
+    "XGBoost": 0.2199,
 
-    "Random Forest": 0.177,
+    "Random Forest": 0.2029,
 
-    "Gradient Boosting": 0.20,
+    "Gradient Boosting": 0.4224,
 
-    "SVM": 0.149,
+    "SVM": 0.1837,
 
-    "Logistic Regression": 0.134,
+    "Logistic Regression": 0.1410,
 
-    "KNN": 0.141
+    "KNN": 0.1710
 }
 
 

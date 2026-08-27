@@ -47,7 +47,7 @@ def load_subject(signal_path, label_path):
     )  #ecg
 
 
-    n = len(eda) // 8
+    n = len(eda) // 32
 
     eda = resample(eda, n)
     bvp = resample(bvp, n)

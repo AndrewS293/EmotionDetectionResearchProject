@@ -44,6 +44,9 @@ def weighted_ensemble( probabilities, weights ):
     # ======================================================== 
     # FINAL PREDICTION 
     # ======================================================== 
+    combined_probabilities[3] *= 1.3  # Add a small bias to the "Meditation" class
+    combined_probabilities[2] *= 1.15  # Add a small bias to the "Amusement" class
+
     final_prediction = max( combined_probabilities, key=combined_probabilities.get ) 
     # ======================================================== 
     # CONFIDENCE 

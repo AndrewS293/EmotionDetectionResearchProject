@@ -7,8 +7,9 @@ def build_model():
     model = Pipeline([
         ('scaler', StandardScaler()),
         ('clf', KNeighborsClassifier(
-            n_neighbors=5,
-            weights='distance'
+            n_neighbors=13,
+            weights='distance',
+            metric="euclidean"
         ))
     ])
 
