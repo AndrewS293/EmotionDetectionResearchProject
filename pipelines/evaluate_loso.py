@@ -1,11 +1,13 @@
 import os
 import numpy as np
 
+import matplotlib.pyplot as plt
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
     classification_report,
-    confusion_matrix
+    confusion_matrix,
+    ConfusionMatrixDisplay
 )
 
 from pipelines.data_loader import load_subject
@@ -576,12 +578,17 @@ def run_loso(data_dir):
 
     print("\nCONFUSION MATRIX")
 
+    categories = ['Baseline', 'Stress', 'Amusement', 'Meditation']
+
     cm = confusion_matrix(
         all_true,
         all_ensemble_predictions
     )
 
-    print(cm)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=categories)
+    disp.plot(map=plt.cm.Blues)
+    plt.title("LOSO Ensemble Confusion Matrix")
+    plt.show()
 
     # --------------------------------------------------------
     # PER-SUBJECT RESULTS

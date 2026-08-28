@@ -64,6 +64,7 @@ def extract_eda_features(w):
         np.std(w),
         np.min(w),
         np.max(w),
+        np.percentile(w, 75) - np.percentile(w, 25),
         np.median(w)
     ])
 
@@ -72,6 +73,7 @@ def extract_eda_features(w):
         'EDA Std',
         'EDA Min',
         'EDA Max',
+        'EDA IQR'
         'EDA Median'
     ])
 
@@ -212,18 +214,22 @@ def extract_temp_features(w):
 
     feature_names = []
 
+    x = np.arange(len(w))
+
     features.extend([
         np.mean(w),
         np.std(w),
         np.min(w),
-        np.max(w)
+        np.max(w)#,
+        #np.polyfit(x, w, 1)[0]
     ])
 
     feature_names.extend([
         'TEMP Mean',
         'TEMP Std',
         'TEMP Min',
-        'TEMP Max'
+        'TEMP Max'#,
+        #'TEMP Slope'
     ])
 
     diff = np.diff(w)
